@@ -15,20 +15,30 @@ def encode(column, unique_values, id_column_name):
     enc_series.replace('', 'nan', inplace=True)
     return enc_series
 
+
+def expand(index,col,col_name):
+    df = pd.DataFrame({'movie_id': index, f'{col_name}': col})
+    df = (df.set_index('movie_id')[f'{col_name}']
+          .str.split(',', expand=True)
+          .stack()
+          .reset_index(level=1, drop=True)
+          .reset_index(name=f'{col_name}'))
+    return df
+
 data = pd.read_csv('../../data/imdb_movies.csv')
 
 movies_df = data[['names', 'date_x', 'orig_lang', 'country', 'overview', 'score']]
 movies_df.columns = ['title', 'date', 'original_lang', 'country', 'overview', 'score']  # rename columns
 
 # save movies data to separate csv
-movies_df.to_csv('../../data/separated_dfs/movies.csv', index=True)
+movies_df.to_csv('../../data/separated_dfs/movies.csv', index=True, index_label='movie_id')
 
 # create np.array of unique movie genres
 unique_genres = data['genre'].astype(str).str.split(',\xa0', expand=True).stack().unique()
 # remove NaN and convert to series
 unique_genres = pd.Series(unique_genres[unique_genres != 'nan'], name='genre_name')
 # save genres data to separate csv
-unique_genres.to_csv('../../data/separated_dfs/genres.csv', index=True)
+unique_genres.to_csv('../../data/separated_dfs/genres.csv', index=True,index_label='genre_id')
 
 actors_list = []
 # remove some bad formatting and drop cells with mistakes in the data
@@ -64,12 +74,18 @@ name = [unique[0][i] for i in range(len(unique[0]))
 
 # save actors data to separate csv
 actors = pd.Series(name, name='actor_name')
-actors.to_csv('../../data/separated_dfs/actors.csv', index=True)
+actors.to_csv('../../data/separated_dfs/actors.csv', index=True,index_label='actor_id')
 
 # save movies_and_genres data to separate csv
 genres_series = encode(data['genre'], unique_genres, 'genre_id')
-genres_series.to_csv('../../data/separated_dfs/movies_genres.csv', index=True)
+#genres_series.to_csv('../../data/separated_dfs/movies_genres.csv', index=False)
 
 # save movies_and_actors data to separate csv
 actors_series = encode(data['crew'], actors, 'actor_id')
-actors_series.to_csv('../../data/separated_dfs/movies_actors.csv', index=True)
+
+
+
+movies_actors = expand(list(movies_df.index),actors_series,'actor_id')
+movies_actors.to_csv('../../data/separated_dfs/movies_actors.csv', index=False)
+movies_genres = expand(list(movies_df.index),genres_series,'genre_id')
+movies_genres.to_csv('../../data/separated_dfs/movies_genres.csv', index=False)
