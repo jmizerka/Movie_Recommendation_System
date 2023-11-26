@@ -6,10 +6,10 @@ def encode(column, unique_values, id_column_name):
     temp_list = []
 
     for i in encoded_column:
-        i.replace(',\xa0',',')
+        i=i.replace(',\xa0',',')
         values = i.split(',')
         ids = [str(unique_values.index[unique_values == j.strip()].values[0]) for j in values if unique_values.isin([j.strip()]).any()]
-        new_list = ', '.join(ids) if ids else 'nan'
+        new_list = ','.join(ids) if ids else np.nan
         temp_list.append(new_list)
     enc_series = pd.Series(temp_list, name=id_column_name)
     enc_series.replace('', 'nan', inplace=True)
@@ -19,16 +19,19 @@ def encode(column, unique_values, id_column_name):
 def expand(index,col,col_name):
     df = pd.DataFrame({'movie_id': index, f'{col_name}': col})
     df = (df.set_index('movie_id')[f'{col_name}']
-          .str.split(',', expand=True)
+          .str.split(',', expand=True).astype(np.float64)
           .stack()
           .reset_index(level=1, drop=True)
           .reset_index(name=f'{col_name}'))
     return df
 
-data = pd.read_csv('../../data/imdb_movies.csv')
 
+data = pd.read_csv('../../data/imdb_movies.csv')
+data = data.drop_duplicates(subset=['names', 'date_x'])
+data = data.reset_index(drop=True)
 movies_df = data[['names', 'date_x', 'orig_lang', 'country', 'overview', 'score']]
 movies_df.columns = ['title', 'date', 'original_lang', 'country', 'overview', 'score']  # rename columns
+movies_df['date'] = movies_df['date'].str[-5:]
 
 # save movies data to separate csv
 movies_df.to_csv('../../data/separated_dfs/movies.csv', index=True, index_label='movie_id')
@@ -83,9 +86,11 @@ genres_series = encode(data['genre'], unique_genres, 'genre_id')
 # save movies_and_actors data to separate csv
 actors_series = encode(data['crew'], actors, 'actor_id')
 
-
-
 movies_actors = expand(list(movies_df.index),actors_series,'actor_id')
+
 movies_actors.to_csv('../../data/separated_dfs/movies_actors.csv', index=False)
 movies_genres = expand(list(movies_df.index),genres_series,'genre_id')
 movies_genres.to_csv('../../data/separated_dfs/movies_genres.csv', index=False)
+
+
+
