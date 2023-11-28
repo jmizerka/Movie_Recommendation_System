@@ -42,6 +42,10 @@ tables_script = """
         FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE,
         FOREIGN KEY (actor_id) REFERENCES actors(actor_id)
     );
+    CREATE table your_ratings(
+        movie_title TEXT,
+        rating REAL,
+        date TEXT
         """
 
 cursor.executescript(tables_script)

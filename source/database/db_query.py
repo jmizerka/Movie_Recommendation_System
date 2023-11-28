@@ -67,22 +67,6 @@ def add_actor_or_genre(cursor, params):
         if count == 0:
             cursor.execute("INSERT INTO genres (genre_name) VALUES (?)", (params[0],))
 
-MOVIE_BY_TITLE = f"""SELECT
-     GROUP_CONCAT(genres.genre_name) AS genres,
-     movies.date,
-     movies.original_lang,
-     movies.country,
-     movies.score
-     FROM
-     movies
-     JOIN
-     movies_genres ON movies.movie_id = movies_genres.movie_id
-    JOIN
-     genres ON movies_genres.genre_id = genres.genre_id
-    WHERE 
-     movies.title = ?
-    GROUP BY
-     movies.title
-    ORDER BY
-     movies.score DESC;"""
-
+@db_connector
+def add_rating(cursor,params):
+    cursor.execute(f"INSERT INTO your_ratings (movie_title,rating,date) VALUES (?, ?, ?)", (params[0],params[1],params[2]))

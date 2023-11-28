@@ -5,6 +5,7 @@ from ttkthemes import ThemedStyle
 import sys
 import tkinter.filedialog
 import tkinter.messagebox
+import sys
 sys.path.append('../database')
 import pandas as pd
 
@@ -37,7 +38,8 @@ class QueryDatabase:
             'new_genre': {'query': add_actor_or_genre, 'parameter_name': ('genre_name',)},
             'new_movie': {'query': add_movie, 'parameter_name': ('title', 'date', 'original_lang', 'country', 'overview', 'score', 'genres',)},
             'remove_data': {'query': remove, 'parameter_name': ('table_name', 'col', 'id',)},
-            'update_data': {'query': update, 'parameter_name': ('table_name', 'col_name', 'value', 'condition',)}}
+            'update_data': {'query': update, 'parameter_name': ('table_name', 'col_name', 'value', 'condition',)},
+            'custom':{'query':None, 'parameter_name': None}}
 
     def create_query_database_frame(self):
         query_frame = ttk.Frame(self.master)
@@ -47,18 +49,39 @@ class QueryDatabase:
                          'all_movies_genre', 'movie_info', 'movies_from_year', 'actors_stats',
                          'highest_rated', 'lowest_rated', 'num_movies_genre',
                          'avg_score_genre', 'avg_score_actor', 'remove_data', 'update_data',
-                         'new_movie', 'new_actor', 'new_genre', 'to_csv']
+                         'new_movie', 'new_actor', 'new_genre', 'custom']
         idx = 0
         for i in range(5):
             for j in range(4):
                 button_text = query_buttons[idx]
                 idx += 1
-                button = ttk.Button(query_frame, text=button_text, width=20, padding=(10, 5), style='TButton', command=lambda btn=button_text: self.button_clicked(btn))
-                button.grid(row=i, column=j, padx=100, pady=50)
+                button = ttk.Button(
+                    query_frame,
+                    text=button_text,
+                    width=20,
+                    padding=(10, 5),
+                    style='TButton',
+                    command=lambda btn=button_text: self.button_clicked(btn)
+                )
+                button.grid(row=i, column=j, padx=0.02 * self.master.winfo_screenwidth(),
+                            pady=0.02 * self.master.winfo_screenheight())
                 self.buttons[button_text] = button
 
-        go_back_button = ttk.Button(query_frame, text="Go back", command=self.master.create_main_menu, style='TButton')
-        go_back_button.grid(row=6, column=0, pady=40, padx=600, columnspan=4, sticky="ew")
+        go_back_button = ttk.Button(
+            query_frame,
+            text="Go back",
+            command=self.master.create_main_menu,
+            style='TButton'
+        )
+        go_back_button.grid(
+            row=6,
+            column=0,
+            pady=0.02 * self.master.winfo_screenheight(),
+            padx=0.2 * self.master.winfo_screenwidth(),
+            columnspan=4,
+            sticky="ew"
+        )
+
         for i in range(6):
             query_frame.grid_rowconfigure(i, weight=5)
         for j in range(3):
@@ -105,11 +128,14 @@ class QueryDatabase:
         new_window.style.configure('TButton', font=('Helvetica', 25))
 
         # Add a scrollable Text widget to display the DataFrame
-        text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Helvetica', 14))
+        text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Courier', 14))
         text_widget.pack(padx=20, pady=20, expand=True, fill="both")
 
-        # Insert DataFrame data into the Text widget
-        text_widget.insert(tk.END, dataframe.to_string(index=False))
+        # Convert DataFrame to a formatted string with wide column spacing
+        formatted_text = self.format_dataframe(dataframe)
+
+        # Insert formatted text into the Text widget
+        text_widget.insert(tk.END, formatted_text)
         text_widget.tag_configure("center", justify="center")
         text_widget.tag_add("center", "1.0", "end")
 
@@ -120,6 +146,28 @@ class QueryDatabase:
         # Add a close button
         close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
         close_button.pack(pady=10)
+
+    def format_dataframe(self, dataframe):
+        # Get column names and data
+        columns = dataframe.columns
+        data = dataframe.values
+
+        # Calculate maximum width for each column
+        max_widths = [max(len(str(col)), max(len(str(value)) for value in data[:, i])) for i, col in enumerate(columns)]
+
+        # Set a minimum spacing between columns
+        min_spacing = 4
+
+        # Format column headers
+        formatted_text = "|".join(f"{col:<{width + min_spacing}}" for col, width in zip(columns, max_widths)) + "\n"
+        formatted_text += "|".join("-" * (width + min_spacing) for width in max_widths) + "\n"
+
+        # Format data rows
+        for row in data:
+            formatted_text += "|".join(
+                f"{str(value):<{width + min_spacing}}" for value, width in zip(row, max_widths)) + "\n"
+
+        return formatted_text
 
     def show_new_screen(self, button_name):
         new_window = tk.Toplevel(self.master)
@@ -135,13 +183,19 @@ class QueryDatabase:
         input_frame.pack(pady=20)
 
         entry_dict = {}
-
-        for i, text in enumerate(self.query_dict[button_name]['parameter_name']):
-            label = ttk.Label(input_frame, text=f"{text}")
-            label.grid(row=i, column=0, padx=10, pady=10, sticky="e")
+        if button_name != 'custom':
+            for i, text in enumerate(self.query_dict[button_name]['parameter_name']):
+                label = ttk.Label(input_frame, text=f"{text}")
+                label.grid(row=i, column=0, padx=10, pady=10, sticky="e")
+                entry = ttk.Entry(input_frame, font=('Helvetica', 14))
+                entry.grid(row=i, column=1, padx=10, pady=10, sticky="w")
+                entry_dict[text] = entry
+        else:
+            label = ttk.Label(input_frame, text="Write yoour custom query here")
+            label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
             entry = ttk.Entry(input_frame, font=('Helvetica', 14))
-            entry.grid(row=i, column=1, padx=10, pady=10, sticky="w")
-            entry_dict[text] = entry
+            entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+            entry_dict['query'] = entry
 
         def proceed_action():
             # Check if all entries are filled
@@ -159,6 +213,9 @@ class QueryDatabase:
                     params = tuple(entry.get() for entry in entry_dict.values())
                     self.query_dict[button_name]['query'](params)
                     data = None
+                elif button_name == 'custom':
+                    params = None
+                    data = show_all(str(entry_dict['query'].get()),params)
                 else:
                     params = tuple(entry.get() for entry in entry_dict.values())
                     data = show_all(self.query_dict[button_name]['query'],params)
@@ -191,7 +248,7 @@ class QueryDatabase:
             save_button = ttk.Button(text_window, text="Save to CSV", command=lambda: self.save_to_csv(data))
             save_button.pack(pady=10)
         else:
-            label = ttk.Label(text_window, text="Operation is Done. You may close the window", font=('Helvetica', 16))
+            label = ttk.Label(text_window, text="Operation is done. You may close the window", font=('Helvetica', 16))
             label.pack(side='top', anchor='center')
 
     def save_to_csv(self, dataframe):
@@ -199,4 +256,3 @@ class QueryDatabase:
         if file_path:
             dataframe.to_csv(file_path, index=False)
             tkinter.messagebox.showinfo("Save to CSV", "Data has been saved to CSV successfully.")
-
