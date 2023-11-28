@@ -23,7 +23,6 @@ def show_all(cursor,query,params=None):
     column_names = [column[0] for column in cursor.description]
     df = pd.DataFrame(data,columns=column_names)
     return df
-pd.set_option('display.expand_frame_repr', False)
 
 @db_connector
 def remove(cursor,table,col,id):
@@ -56,13 +55,34 @@ def add_movie(cursor, title, date, original_lang, country, overview, score, genr
         print("Film o takim samym tytule i roku już istnieje.")
 
 @db_connector
-def add_actor(cursor, actor_name):
-    # Sprawdź, czy aktor o takim samym imieniu nie istnieje już w tabeli
-    cursor.execute("SELECT COUNT(*) FROM actors WHERE actor_name = ?", (actor_name,))
-    count = cursor.fetchone()[0]
-    if count == 0:
-        cursor.execute("INSERT INTO actors (actor_name) VALUES (?)", (actor_name,))
-        actor_id = cursor.lastrowid
-        print("Aktor został dodany.")
+def add_actor_or_genre(cursor, params):
+    if params[1] == 'actors':
+        cursor.execute(f"SELECT COUNT(*) FROM {params[1]} WHERE actor_name = ?", (params[0],))
+        count = cursor.fetchone()[0]
+        if count == 0:
+            cursor.execute("INSERT INTO actors (actor_name) VALUES (?)", (params[0],))
     else:
-        print("Aktor o takim samym imieniu już istnieje.")
+        cursor.execute(f"SELECT COUNT(*) FROM {params[1]} WHERE genre_name = ?", (params[0],))
+        count = cursor.fetchone()[0]
+        if count == 0:
+            cursor.execute("INSERT INTO genres (genre_name) VALUES (?)", (params[0],))
+
+MOVIE_BY_TITLE = f"""SELECT
+     GROUP_CONCAT(genres.genre_name) AS genres,
+     movies.date,
+     movies.original_lang,
+     movies.country,
+     movies.score
+     FROM
+     movies
+     JOIN
+     movies_genres ON movies.movie_id = movies_genres.movie_id
+    JOIN
+     genres ON movies_genres.genre_id = genres.genre_id
+    WHERE 
+     movies.title = ?
+    GROUP BY
+     movies.title
+    ORDER BY
+     movies.score DESC;"""
+

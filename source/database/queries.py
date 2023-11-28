@@ -45,17 +45,17 @@ MOVIE_BY_TITLE = f"""SELECT
      movies.date,
      movies.original_lang,
      movies.country,
-     movies.score,
+     movies.score
      FROM
      movies
      JOIN
      movies_genres ON movies.movie_id = movies_genres.movie_id
     JOIN
-     genres ON movies_genres.genre_id = genre.genre_id
-    GROUP BY
-     movies.title
+     genres ON movies_genres.genre_id = genres.genre_id
     WHERE 
      movies.title = ?
+    GROUP BY
+     movies.title
     ORDER BY
      movies.score DESC;"""
 
@@ -88,49 +88,19 @@ MOVIES_OF_YEAR = f"""SELECT
      GROUP_CONCAT(genres.genre_name) AS genres,
      movies.original_lang,
      movies.country,
-     movies.score, 
+     movies.score
      FROM
      movies
      JOIN
      movies_genres ON movies.movie_id = movies_genres.movie_id
     JOIN
-     genres ON movies_genres.genre_id = genre.genre_id
-    GROUP BY
-     movies.title
+     genres ON movies_genres.genre_id = genres.genre_id
     WHERE 
      movies.date = ?
+    GROUP BY
+     movies.title
     ORDER BY
      movies.score DESC;"""
-
-# DO SPRAWDZENIA
-ACTOR_STATS = """WITH ActorMovies AS (
-    SELECT
-        a.actor_id,
-        a.actor_name,
-        ma.movie_id,
-        m.score
-    FROM
-        actors a
-    JOIN
-        movies_actors ma ON a.actor_id = ma.actor_id
-    JOIN
-        movies m ON ma.movie_id = m.movie_id
-)
-
-SELECT
-    a.actor_name,
-    COUNT(am.movie_id) AS total_movies,
-    MAX(am.score) AS max_score,
-    MIN(am.score) AS min_score,
-    COUNT(DISTINCT g.genre_id) AS total_genres
-FROM
-    ActorMovies am
-JOIN
-    movies_genres g ON am.movie_id = g.movie_id
-GROUP BY
-    a.actor_id, a.actor_name;
-
-"""
 
 HIGHEST_RATED = """SELECT
      movies.title,
@@ -138,18 +108,18 @@ HIGHEST_RATED = """SELECT
      movies.date,
      movies.original_lang,
      movies.country,
-     movies.score,
+     movies.score
      FROM
      movies
      JOIN
      movies_genres ON movies.movie_id = movies_genres.movie_id
     JOIN
-     genres ON movies_genres.genre_id = genre.genre_id
+     genres ON movies_genres.genre_id = genres.genre_id
     GROUP BY
      movies.title
     ORDER BY
      movies.score DESC
-     LIMIT 10;"""
+     LIMIT 100;"""
 
 LOWEST_RATED = """SELECT
      movies.title,
@@ -157,18 +127,18 @@ LOWEST_RATED = """SELECT
      movies.date,
      movies.original_lang,
      movies.country,
-     movies.score,
+     movies.score
      FROM
      movies
      JOIN
      movies_genres ON movies.movie_id = movies_genres.movie_id
     JOIN
-     genres ON movies_genres.genre_id = genre.genre_id
+     genres ON movies_genres.genre_id = genres.genre_id
     GROUP BY
      movies.title
     ORDER BY
      movies.score ASC
-     LIMIT 10;"""
+     LIMIT 100;"""
 
 NUM_MOVIES_BY_GENRE="""SELECT
     genres.genre_name,
@@ -223,3 +193,20 @@ LEFT JOIN
     genres g ON mg.genre_id = g.genre_id
 GROUP BY
     a.actor_id;"""
+
+query_dict = {
+    'all_actors': {'query': ALL_ACTORS, 'parameter_name': None},
+    'all_movies': {'query': ALL_MOVIES, 'parameter_name': None},
+    'all_genres': {'query': ALL_GENRES, 'parameter_name': None},
+    'actors_stats': {'query': ACTOR_STATS, 'parameter_name': None},
+    'all_movies_actor': {'query':MOVIES_OF_ACTOR, 'parameter_name': ('actor_name',)},
+    'all_actors_movie': {'query': ACTORS_IN_MOVIE,'parameter_name':('title',)},
+    'all_movies_genre': {'query': MOVIES_OF_GENRE, 'parameter_name': ('genre_name',)},
+    'movie_info': {'query': MOVIE_BY_TITLE, 'parameter_name': 'movie_title'},
+    'movies_from_year': {'query': MOVIES_OF_YEAR, 'parameter_name': 'release_year'},
+    'highest_rated': {'query': HIGHEST_RATED, 'parameter_name': None},
+    'lowest_rated': {'query': LOWEST_RATED, 'parameter_name': None},
+    'num_movies_genre': {'query': NUM_MOVIES_BY_GENRE, 'parameter_name': None},
+    'avg_score_genre': {'query': AVG_RATE_BY_GENRE, 'parameter_name': None},
+    'avg_score_actor': {'query': AVG_RATE_BY_ACTOR, 'parameter_name': None}}
+
