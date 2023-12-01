@@ -8,27 +8,27 @@
 
   The system utilizes a relational database with six main tables:
 
-  -Movies Table: Contains information about each movie, such as title, release year, plot overview etc.
+  - Movies Table: Contains information about each movie, such as title, release year, plot overview etc.
 
-  -Actors Table: Stores details about actors.
+  - Actors Table: Stores details about actors.
 
-  -Genres Table: Stores details about movie genres.
+  - Genres Table: Stores details about movie genres.
 
-  -Ratings Table: Keeps track of user ratings for movies.
+  - Ratings Table: Keeps track of user ratings for movies.
 
-  -Movies_Genres Table: maps genres (may be more than one) to corresponding movies
+  - Movies_Genres Table: maps genres (may be more than one) to corresponding movies
 
-  -Movies_Actors Table: maps actors (may be more than one) to corresponding movies
+  - Movies_Actors Table: maps actors (may be more than one) to corresponding movies
 
 ### 2. Database Panel
 
   The system includes a panel for interacting with the database. Users can:
 
-  -Retrieve Basuc Information: Fetch details about movies, actors, the highest and lowest rated movies and many more.
+  - Retrieve Basuc Information: Fetch details about movies, actors, the highest and lowest rated movies and many more.
 
-  -Add Records: add movies, actors, genres and ratings data
+  - Add Records: add movies, actors, genres and ratings data
 
-  -Write Custom SQL Queries: Users can write their own SQL queries if the basic queries are insufficient for their needs.
+  - Write Custom SQL Queries: Users can write their own SQL queries if the basic queries are insufficient for their needs.
 
 ### 3. Movie Recommender System
   The recommendation system suggests similar movies based on a given title. It employs very basic recommendation algorithm based on Count Vectorizer. I intend to build a more advanced algorithm in the future
