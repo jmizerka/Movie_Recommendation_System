@@ -1,4 +1,3 @@
-# query_database.py
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog, messagebox
 from ttkthemes import ThemedStyle
@@ -94,7 +93,8 @@ class QueryDatabase:
     def get_query_result(self, button_name):
         return show_all(self.query_dict[button_name]['query'], self.query_dict[button_name]['parameter_name'])
 
-    def style(self, window, title):
+    @staticmethod
+    def style(window, title):
         window.geometry("800x600")
         window.title(f"{title}")
         window.style = ThemedStyle()
@@ -120,7 +120,8 @@ class QueryDatabase:
         close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
         close_button.pack(pady=10)
 
-    def format_dataframe(self, dataframe):
+    @staticmethod
+    def format_dataframe(dataframe):
         columns = dataframe.columns
         data = dataframe.values
         max_widths = [max(len(str(col)), max(len(str(value)) for value in data[:, i])) for i, col in enumerate(columns)]
@@ -163,7 +164,8 @@ class QueryDatabase:
             entry.grid(row=i, column=1, padx=10, pady=10, sticky="w")
             entry_dict[text] = entry
 
-    def create_custom_query_entry(self, input_frame, entry_dict):
+    @staticmethod
+    def create_custom_query_entry(input_frame, entry_dict):
         label = ttk.Label(input_frame, text="Write your custom query here")
         label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
         entry = ttk.Entry(input_frame, font=('Helvetica', 14))
@@ -176,7 +178,8 @@ class QueryDatabase:
             data = self.execute_query(button_name, params)
             self.show_in_window(data)
 
-    def get_params_for_action(self, button_name, entry_dict):
+    @staticmethod
+    def get_params_for_action(button_name, entry_dict):
         if button_name in ['new_actor', 'new_genre']:
             entry_list = [entry.get() for entry in entry_dict.values()]
             entry_list.append('actors') if button_name == 'new_actor' else entry_list.append('genres')
@@ -202,7 +205,8 @@ class QueryDatabase:
 
         return data
 
-    def save_to_csv(self, dataframe):
+    @staticmethod
+    def save_to_csv(dataframe):
         file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
         if file_path:
             dataframe.to_csv(file_path, index=False)

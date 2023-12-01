@@ -26,7 +26,8 @@ class MovieRecommendation:
         submit_button = ttk.Button(recommendation_frame, text="Submit", command=lambda: self.show_result_window(entry))
         submit_button.pack(pady=10, side="top", anchor="center")
 
-    def load_recommendation_variables(self):
+    @staticmethod
+    def load_recommendation_variables():
         with open('data/my_variables.pkl', 'rb') as file:
             loaded_variables_dict = pickle.load(file)
         return loaded_variables_dict['indices'], loaded_variables_dict['similarity']
