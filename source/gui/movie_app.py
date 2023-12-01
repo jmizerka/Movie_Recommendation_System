@@ -4,6 +4,7 @@ from ttkthemes import ThemedStyle
 from source.gui.query_database import QueryDatabase
 from source.gui.check_ratings import CheckRatings
 from source.gui.movie_recommendation import MovieRecommendation
+from source.database.db_query import query_dict
 
 
 class MovieApp(tk.Tk):
@@ -40,7 +41,7 @@ class MovieApp(tk.Tk):
 
     def show_query_database(self):
         self.destroy_main_menu()
-        QueryDatabase(self)
+        QueryDatabase(self, query_dict)
 
     def show_check_ratings(self):
         self.destroy_main_menu()

@@ -1,38 +1,15 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog, messagebox
 from ttkthemes import ThemedStyle
-from source.database.queries import *
-from source.database.db_query import show_all, remove, update, add_movie, add_actor_or_genre
+from source.database.db_query import show_all
 
 
 class QueryDatabase:
-    def __init__(self, master):
+    def __init__(self, master, query_dict):
         self.master = master
         self.buttons = {}
         self.create_query_database_frame()
-        self.query_dict = {
-            'all_actors': {'query': ALL_ACTORS, 'parameter_name': None},
-            'all_movies': {'query': ALL_MOVIES, 'parameter_name': None},
-            'all_genres': {'query': ALL_GENRES, 'parameter_name': None},
-            'actors_stats': {'query': ACTOR_STATS, 'parameter_name': None},
-            'all_movies_actor': {'query': MOVIES_OF_ACTOR, 'parameter_name': ('actor_name',)},
-            'all_actors_movie': {'query': ACTORS_IN_MOVIE, 'parameter_name': ('title',)},
-            'all_movies_genre': {'query': MOVIES_OF_GENRE, 'parameter_name': ('genre_name',)},
-            'movie_info': {'query': MOVIE_BY_TITLE, 'parameter_name': ('movie_title',)},
-            'movies_from_year': {'query': MOVIES_OF_YEAR, 'parameter_name': ('release_year',)},
-            'highest_rated': {'query': HIGHEST_RATED, 'parameter_name': None},
-            'lowest_rated': {'query': LOWEST_RATED, 'parameter_name': None},
-            'num_movies_genre': {'query': NUM_MOVIES_BY_GENRE, 'parameter_name': None},
-            'avg_score_genre': {'query': AVG_RATE_BY_GENRE, 'parameter_name': None},
-            'avg_score_actor': {'query': AVG_RATE_BY_ACTOR, 'parameter_name': None},
-            'new_actor': {'query': add_actor_or_genre, 'parameter_name': ('actor_name',)},
-            'new_genre': {'query': add_actor_or_genre, 'parameter_name': ('genre_name',)},
-            'new_movie': {'query': add_movie,
-                          'parameter_name': ('title', 'date', 'original_lang',
-                                             'country', 'overview', 'score', 'genres',)},
-            'remove_data': {'query': remove, 'parameter_name': ('table_name', 'col', 'id',)},
-            'update_data': {'query': update, 'parameter_name': ('table_name', 'col_name', 'value', 'condition',)},
-            'custom': {'query': None, 'parameter_name': None}}
+        self.query_dict = query_dict
 
     def create_query_database_frame(self):
         query_frame = ttk.Frame(self.master)
@@ -106,17 +83,19 @@ class QueryDatabase:
         new_window = tk.Toplevel(self.master)
         self.style(new_window, "Query Result Window")
 
-        text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Courier', 14))
-        text_widget.pack(padx=20, pady=20, expand=True, fill="both")
+        if dataframe is not None:
+            text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Courier', 14))
+            text_widget.pack(padx=20, pady=20, expand=True, fill="both")
+            formatted_text = self.format_dataframe(dataframe)
+            text_widget.insert(tk.END, formatted_text)
+            text_widget.tag_configure("center", justify="center")
+            text_widget.tag_add("center", "1.0", "end")
 
-        formatted_text = self.format_dataframe(dataframe)
-        text_widget.insert(tk.END, formatted_text)
-        text_widget.tag_configure("center", justify="center")
-        text_widget.tag_add("center", "1.0", "end")
-
-        save_button = ttk.Button(new_window, text="Save to CSV", command=lambda: self.save_to_csv(dataframe))
-        save_button.pack(pady=10)
-
+            save_button = ttk.Button(new_window, text="Save to CSV", command=lambda: self.save_to_csv(dataframe))
+            save_button.pack(pady=10)
+        else:
+            label = ttk.Label(new_window, text=" Action done. You may close the window")
+            label.pack(side="top", anchor="center")
         close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
         close_button.pack(pady=10)
 
@@ -181,28 +160,19 @@ class QueryDatabase:
     @staticmethod
     def get_params_for_action(button_name, entry_dict):
         if button_name in ['new_actor', 'new_genre']:
-            entry_list = [entry.get() for entry in entry_dict.values()]
-            entry_list.append('actors') if button_name == 'new_actor' else entry_list.append('genres')
-            params = tuple(entry_list)
-        elif button_name in ['new_movie', 'title', 'update_data', 'custom']:
-            params = tuple(entry.get() for entry in entry_dict.values())
+            params = tuple([entry.get() for entry in entry_dict.values()])
         else:
             params = tuple(entry.get() for entry in entry_dict.values())
-
         return params
 
     def execute_query(self, button_name, params):
-        if button_name in ['new_actor', 'new_genre']:
-            add_actor_or_genre(*params)
-            data = None
-        elif button_name in ['new_movie', 'title', 'update_data']:
-            add_movie(*params)
+        if button_name in ['new_actor', 'new_genre', 'new_movie', 'update_data', 'remove_data']:
+            self.query_dict[button_name]['query'](params)
             data = None
         elif button_name == 'custom':
-            data = show_all(str(params[0]), None)
+            data = self.query_dict[button_name]['query'](str(params[0]))
         else:
             data = show_all(self.query_dict[button_name]['query'], params)
-
         return data
 
     @staticmethod
