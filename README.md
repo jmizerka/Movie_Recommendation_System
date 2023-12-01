@@ -1,7 +1,7 @@
 # Movie Recommender System
 
 ## Overview
-  This project is a Movie Recommender System designed to provide users with personalized movie recommendations based on their preferences. The system includes a database containing information about movies, actors, and user ratings.   Additionally, it features a panel for querying the database, extracting basic information, and writing custom SQL queries. The system employs a basic content-based recommendation algorithm to suggest similar movies based on a given title.
+  This project is a Movie Recommender System I designed for fun. Feel free to adapt it to your own needs. It can provide the user with personalized movie recommendations based on their preferences. The system includes a database containing information about movies, actors, and user ratings. Additionally, it features a panel for querying the database, extracting basic information, and writing custom SQL queries. The system employs a basic content-based recommendation algorithm to suggest similar movies based on a given title.
 
 ## Components
 ### 1. Database
