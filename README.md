@@ -5,7 +5,8 @@ This project is a Movie Recommender System designed to provide users with person
 
 ## Components
 ### 1. Database
-The system utilizes a relational database with six main tables:
+
+  The system utilizes a relational database with six main tables:
 
 Movies Table: Contains information about each movie, such as title, release year, plot overview etc.
 
@@ -35,7 +36,7 @@ The recommendation system suggests similar movies based on a given title. It emp
 ## Requirements
 Make sure you have the required Python libraries installed. You can install them using the following command:
 
-pip install -r requirements.txt
+'''pip install -r requirements.txt'''
 
 ## Running the System
 
