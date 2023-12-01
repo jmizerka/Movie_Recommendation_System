@@ -36,7 +36,7 @@ The recommendation system suggests similar movies based on a given title. It emp
 ## Requirements
 Make sure you have the required Python libraries installed. You can install them using the following command:
 
-'''pip install -r requirements.txt'''
+`pip install -r requirements.txt`
 
 ## Running the System
 
