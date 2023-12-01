@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-import numpy as np
+
 actors = pd.read_csv('../../data/separated_dfs/actors.csv')
 genres = pd.read_csv('../../data/separated_dfs/genres.csv')
 movies = pd.read_csv('../../data/separated_dfs/movies.csv')
@@ -45,7 +45,7 @@ tables_script = """
     CREATE table your_ratings(
         movie_title TEXT,
         rating REAL,
-        date TEXT
+        date TEXT);
         """
 
 cursor.executescript(tables_script)

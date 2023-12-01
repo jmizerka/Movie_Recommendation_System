@@ -1,10 +1,9 @@
 import sqlite3
 import pandas as pd
-from queries import *
 
 def db_connector(func):
     def wrapper(*args,**kwargs):
-        conn = sqlite3.connect('../../data/movies.db')
+        conn = sqlite3.connect('data/movies.db')
         cursor = conn.cursor()
         result = func(cursor,*args,**kwargs)
         conn.commit()

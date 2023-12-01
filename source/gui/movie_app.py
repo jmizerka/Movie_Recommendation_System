@@ -1,10 +1,10 @@
-# movie_app.pyq
+#movie_app.pyq
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedStyle
-from query_database import QueryDatabase
-from check_ratings import CheckRatings
-from movie_recommendation import MovieRecommendation
+from source.gui.query_database import QueryDatabase
+from source.gui.check_ratings import CheckRatings
+from source.gui.movie_recommendation import MovieRecommendation
 
 class MovieApp(tk.Tk):
     def __init__(self):

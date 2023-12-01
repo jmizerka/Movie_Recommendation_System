@@ -194,19 +194,4 @@ LEFT JOIN
 GROUP BY
     a.actor_id;"""
 
-query_dict = {
-    'all_actors': {'query': ALL_ACTORS, 'parameter_name': None},
-    'all_movies': {'query': ALL_MOVIES, 'parameter_name': None},
-    'all_genres': {'query': ALL_GENRES, 'parameter_name': None},
-    'actors_stats': {'query': ACTOR_STATS, 'parameter_name': None},
-    'all_movies_actor': {'query':MOVIES_OF_ACTOR, 'parameter_name': ('actor_name',)},
-    'all_actors_movie': {'query': ACTORS_IN_MOVIE,'parameter_name':('title',)},
-    'all_movies_genre': {'query': MOVIES_OF_GENRE, 'parameter_name': ('genre_name',)},
-    'movie_info': {'query': MOVIE_BY_TITLE, 'parameter_name': 'movie_title'},
-    'movies_from_year': {'query': MOVIES_OF_YEAR, 'parameter_name': 'release_year'},
-    'highest_rated': {'query': HIGHEST_RATED, 'parameter_name': None},
-    'lowest_rated': {'query': LOWEST_RATED, 'parameter_name': None},
-    'num_movies_genre': {'query': NUM_MOVIES_BY_GENRE, 'parameter_name': None},
-    'avg_score_genre': {'query': AVG_RATE_BY_GENRE, 'parameter_name': None},
-    'avg_score_actor': {'query': AVG_RATE_BY_ACTOR, 'parameter_name': None}}
 
