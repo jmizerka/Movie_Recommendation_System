@@ -58,5 +58,4 @@ This command will execute the main.py script, launching the Movie Recommender Sy
   4. Increase and update database - for now it is only about 10000 movies
 
 ## Data
-
-For my database I've used kaggle dataset: https://www.kaggle.com/datasets/ashpalsingh1525/imdb-movies-dataset
+This site was built using [IMDB movies Kaggle Dataset](https://www.kaggle.com/datasets/ashpalsingh1525/imdb-movies-dataset).
