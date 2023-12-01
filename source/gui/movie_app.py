@@ -12,7 +12,7 @@ class MovieApp(tk.Tk):
         self.title("Movie App")
         self.attributes('-fullscreen', True)  # Set to fullscreen
         self.tk.call('lappend', 'auto_path',
-                     '/home/jano/PycharmProjects/Movie_Recommendation_System/data/awthemes-10.4.0')
+                     'data/awthemes-10.4.0')
         self.tk.call('package', 'require', 'awdark')
         self.style = ThemedStyle(self)
         self.style.set_theme("awdark")
