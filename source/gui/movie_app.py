@@ -1,10 +1,10 @@
-#movie_app.pyq
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedStyle
 from source.gui.query_database import QueryDatabase
 from source.gui.check_ratings import CheckRatings
 from source.gui.movie_recommendation import MovieRecommendation
+
 
 class MovieApp(tk.Tk):
     def __init__(self):
@@ -40,7 +40,8 @@ class MovieApp(tk.Tk):
 
     def show_query_database(self):
         self.destroy_main_menu()
-        q_db = QueryDatabase(self)
+        QueryDatabase(self)
+
     def show_check_ratings(self):
         self.destroy_main_menu()
         CheckRatings(self)

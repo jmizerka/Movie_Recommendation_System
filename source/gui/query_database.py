@@ -1,10 +1,9 @@
-#query_database.py
+# query_database.py
 import tkinter as tk
-from tkinter import ttk,scrolledtext,filedialog,messagebox
+from tkinter import ttk, scrolledtext, filedialog, messagebox
 from ttkthemes import ThemedStyle
 from source.database.queries import *
-from source.database.db_query import show_all,remove,update,add_movie,add_actor_or_genre
-
+from source.database.db_query import show_all, remove, update, add_movie, add_actor_or_genre
 
 
 class QueryDatabase:
@@ -29,10 +28,12 @@ class QueryDatabase:
             'avg_score_actor': {'query': AVG_RATE_BY_ACTOR, 'parameter_name': None},
             'new_actor': {'query': add_actor_or_genre, 'parameter_name': ('actor_name',)},
             'new_genre': {'query': add_actor_or_genre, 'parameter_name': ('genre_name',)},
-            'new_movie': {'query': add_movie, 'parameter_name': ('title', 'date', 'original_lang', 'country', 'overview', 'score', 'genres',)},
+            'new_movie': {'query': add_movie,
+                          'parameter_name': ('title', 'date', 'original_lang',
+                                             'country', 'overview', 'score', 'genres',)},
             'remove_data': {'query': remove, 'parameter_name': ('table_name', 'col', 'id',)},
             'update_data': {'query': update, 'parameter_name': ('table_name', 'col_name', 'value', 'condition',)},
-            'custom':{'query':None, 'parameter_name': None}}
+            'custom': {'query': None, 'parameter_name': None}}
 
     def create_query_database_frame(self):
         query_frame = ttk.Frame(self.master)
@@ -82,9 +83,9 @@ class QueryDatabase:
                         pady=0.02 * self.master.winfo_screenheight())
             self.buttons[button_name] = button
 
-
     def button_clicked(self, button_name):
-        if button_name in ['all_actors', 'all_movies', 'all_genres', 'actors_stats', 'highest_rated', 'lowest_rated', 'num_movies_genre', 'avg_score_genre', 'avg_score_actor']:
+        if button_name in ['all_actors', 'all_movies', 'all_genres', 'actors_stats', 'highest_rated', 'lowest_rated',
+                           'num_movies_genre', 'avg_score_genre', 'avg_score_actor']:
             dataframe = self.get_query_result(button_name)
             self.show_in_window(dataframe)
         else:
@@ -93,7 +94,7 @@ class QueryDatabase:
     def get_query_result(self, button_name):
         return show_all(self.query_dict[button_name]['query'], self.query_dict[button_name]['parameter_name'])
 
-    def style(self,window,title):
+    def style(self, window, title):
         window.geometry("800x600")
         window.title(f"{title}")
         window.style = ThemedStyle()
@@ -103,7 +104,7 @@ class QueryDatabase:
 
     def show_in_window(self, dataframe):
         new_window = tk.Toplevel(self.master)
-        self.style(new_window,"Query Result Window")
+        self.style(new_window, "Query Result Window")
 
         text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Courier', 14))
         text_widget.pack(padx=20, pady=20, expand=True, fill="both")
@@ -136,7 +137,7 @@ class QueryDatabase:
 
     def show_new_screen(self, button_name):
         new_window = tk.Toplevel(self.master)
-        self.style(new_window,f"{button_name} Parameters")
+        self.style(new_window, f"{button_name} Parameters")
 
         input_frame = ttk.Frame(new_window)
         input_frame.pack(pady=20)
@@ -147,12 +148,12 @@ class QueryDatabase:
         else:
             self.create_custom_query_entry(input_frame, entry_dict)
 
+        close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
+        close_button.pack(side="bottom", pady=10, anchor="center")
+
         proceed_button = ttk.Button(new_window, text="Proceed",
                                     command=lambda: self.proceed_action(button_name, entry_dict))
         proceed_button.pack(side="bottom", pady=10, anchor="center")
-
-        close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
-        close_button.pack(side="bottom", pady=10, anchor="center")
 
     def create_input_entries(self, button_name, input_frame, entry_dict):
         for i, text in enumerate(self.query_dict[button_name]['parameter_name']):
@@ -180,7 +181,7 @@ class QueryDatabase:
             entry_list = [entry.get() for entry in entry_dict.values()]
             entry_list.append('actors') if button_name == 'new_actor' else entry_list.append('genres')
             params = tuple(entry_list)
-        elif button_name in ['new_movie', 'title', 'update_data','custom']:
+        elif button_name in ['new_movie', 'title', 'update_data', 'custom']:
             params = tuple(entry.get() for entry in entry_dict.values())
         else:
             params = tuple(entry.get() for entry in entry_dict.values())

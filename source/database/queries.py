@@ -32,7 +32,7 @@ ACTORS_IN_MOVIE = f"""SELECT
     ORDER BY
      actors.actor_name;"""
 
-MOVIES_OF_GENRE=f"""SELECT
+MOVIES_OF_GENRE = f"""SELECT
     movies.title
     FROM movies_genres
     JOIN genres ON movies_genres.genre_id = genres.genre_id
@@ -59,7 +59,6 @@ MOVIE_BY_TITLE = f"""SELECT
     ORDER BY
      movies.score DESC;"""
 
-
 ALL_MOVIES = """SELECT
      movies.title,
      GROUP_CONCAT(genres.genre_name) AS genres,
@@ -82,7 +81,6 @@ ALL_GENRES = "SELECT * FROM genres"
 
 ALL_ACTORS = "SELECT * FROM actors"
 
-### TUTAJ TRZEBA POPRAWIĆ BO NA RAZIE WYSZUKUJE PO KONKRETNEJ DACIE
 MOVIES_OF_YEAR = f"""SELECT
      movies.title,
      GROUP_CONCAT(genres.genre_name) AS genres,
@@ -140,7 +138,7 @@ LOWEST_RATED = """SELECT
      movies.score ASC
      LIMIT 100;"""
 
-NUM_MOVIES_BY_GENRE="""SELECT
+NUM_MOVIES_BY_GENRE = """SELECT
     genres.genre_name,
     COUNT(movies.title)
     FROM movies_genres
@@ -149,7 +147,7 @@ NUM_MOVIES_BY_GENRE="""SELECT
     GROUP BY genres.genre_name ;"""
 
 # MEAN RATE OF GENRE
-AVG_RATE_BY_GENRE="""SELECT
+AVG_RATE_BY_GENRE = """SELECT
     g.genre_name,
     AVG(m.score) AS average_score
     FROM
@@ -161,9 +159,7 @@ AVG_RATE_BY_GENRE="""SELECT
     GROUP BY
     g.genre_name;"""
 
-
-
-AVG_RATE_BY_ACTOR="""SELECT
+AVG_RATE_BY_ACTOR = """SELECT
     actors.actor_name,
     AVG(movies.score) AS average_score
     FROM
@@ -193,5 +189,3 @@ LEFT JOIN
     genres g ON mg.genre_id = g.genre_id
 GROUP BY
     a.actor_id;"""
-
-

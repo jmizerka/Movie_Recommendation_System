@@ -49,18 +49,12 @@ tables_script = """
         """
 
 cursor.executescript(tables_script)
-movies.to_sql('movies',conn,index=False,if_exists='append')
-genres.to_sql('genres',conn,index=False,if_exists='append')
-actors.to_sql('actors',conn,index=False,if_exists='append')
-movies_genres.to_sql('movies_genres',conn,index=False,if_exists='append')
-movies_actors.to_sql('movies_actors',conn,index=False,if_exists='append')
+movies.to_sql('movies', conn, index=False, if_exists='append')
+genres.to_sql('genres', conn, index=False, if_exists='append')
+actors.to_sql('actors', conn, index=False, if_exists='append')
+movies_genres.to_sql('movies_genres', conn, index=False, if_exists='append')
+movies_actors.to_sql('movies_actors', conn, index=False, if_exists='append')
 
 conn.commit()
 
 conn.close()
-
-
-
-
-
-

@@ -1,6 +1,5 @@
-# check_ratings.py
 import tkinter as tk
-from tkinter import ttk, scrolledtext, Toplevel, Label, Entry
+from tkinter import ttk, Toplevel, Label, Entry
 from datetime import datetime
 from tkinter import messagebox
 from ttkthemes import ThemedStyle
@@ -25,7 +24,8 @@ class CheckRatings:
 
         text_widget = tk.Text(check_ratings_frame, wrap='none', height=10, width=50)
         text_widget.grid(row=0, column=0, padx=50, pady=10, sticky="nsew")
-        text_widget.tag_configure("center", justify='center', spacing1=15, spacing3=20, spacing2=15, font=('Helvetica', 16))
+        text_widget.tag_configure("center", justify='center', spacing1=15, spacing3=20,
+                                  spacing2=15, font=('Helvetica', 16))
         text_widget.insert('1.0', ratings_data.to_string(index=False), "center")
 
         add_record_button = ttk.Button(check_ratings_frame, text="Add Record", command=self.add_record_window)
@@ -59,7 +59,9 @@ class CheckRatings:
             entry.grid(row=i, column=1, padx=10, pady=10)
             entries.append(entry)
 
-        proceed_button = ttk.Button(add_record_window, text="Proceed", command=lambda: self.proceed_add_record(*[entry.get() for entry in entries], add_record_window))
+        proceed_button = ttk.Button(add_record_window, text="Proceed",
+                                    command=lambda:
+                                    self.proceed_add_record(*[entry.get() for entry in entries], add_record_window))
         proceed_button.grid(row=len(labels), column=0, columnspan=2, pady=10)
 
     def proceed_add_record(self, title, rating, date, add_record_window):
