@@ -42,12 +42,12 @@ Make sure you have the required Python libraries installed. You can install them
 
 To set up the system for the first time, use the following commands:
 
-make first_run
+`make first_run`
 This will execute the necessary scripts to clean the data, create the database, and generate movie vectors for recommendation.
 
 To run the main application, use:
 
-make run
+`make run`
 This command will execute the main.py script, launching the Movie Recommender System.
 
 ## Future improvements
