@@ -1,7 +1,4 @@
 import pandas as pd
-#import nltk
-#nltk.download('stopwords')
-#nltk.download('punkt')
 import numpy as np
 import pickle
 from text_processing import stem_data, vectorize
