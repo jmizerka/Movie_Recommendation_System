@@ -2,19 +2,24 @@ import sqlite3
 import pandas as pd
 from source.database.queries import *
 
-
+# decorator to handle database connection and cursor management
 def db_connector(func):
     def wrapper(*args, **kwargs):
+        # establish connection to sqlite database
         conn = sqlite3.connect('data/movies.db')
         cursor = conn.cursor()
+
+        # execute action
         result = func(cursor, *args, **kwargs)
+
+        # commiting changed and closing
         conn.commit()
         conn.close()
         return result
 
     return wrapper
 
-
+# function to execute a query and return the result as dataframe
 @db_connector
 def show_all(cursor, query, params=None):
     if params:
@@ -32,6 +37,7 @@ def remove(cursor, params):
     cursor.execute(f"DELETE FROM {params[0]} WHERE {params[1]} = ?;", (params[2],))
 
 
+# update data in a table based on condition
 @db_connector
 def update(cursor, params):
     cursor.execute(f"UPDATE {params[0]} SET {params[1]} = ? WHERE {params[3]}", (params[2],))
@@ -42,17 +48,22 @@ def add_movie(cursor, params):
     cursor.execute("SELECT COUNT(*) FROM movies WHERE title = ? AND date = ?", (params[0], params[1]))
     count = cursor.fetchone()[0]
     print(count)
+    # check if entered movie is already in the database
     if count == 0:
+        # if not, insert record
         cursor.execute(
             "INSERT INTO movies (title, date, original_lang, country, overview, score) VALUES (?, ?, ?, ?, ?, ?)",
             (params[0], params[1], params[2], params[3], params[4], params[5],))
         movie_id = cursor.lastrowid
+
+        # add genres to genres table
         for genre_name in params[6].split(','):
             cursor.execute("SELECT genre_id FROM genres WHERE genre_name = ?", (genre_name,))
             genre_id = cursor.fetchone()
             if genre_id:
                 genre_id = genre_id[0]
                 cursor.execute("INSERT INTO movies_genres (movie_id, genre_id) VALUES (?, ?)", (movie_id, genre_id))
+            # skip if the genre already is in the database
             else:
                 print(f"Warning: Genre {genre_name} does not exists in the database")
         print("Movie added")
@@ -66,7 +77,6 @@ def add_actor(cursor, params):
     if count == 0:
         cursor.execute("INSERT INTO actors (actor_name) VALUES (?)", (params[0],))
 
-
 @db_connector
 def add_genre(cursor, params):
     cursor.execute(f"SELECT COUNT(*) FROM genres WHERE genre_name = ?", (params[0],))
@@ -75,12 +85,14 @@ def add_genre(cursor, params):
         cursor.execute("INSERT INTO genres (genre_name) VALUES (?)", (params[0],))
 
 
+# function to store user's movie ratings
 @db_connector
 def add_rating(cursor, params):
     cursor.execute(f"INSERT INTO your_ratings (movie_title,rating,date) VALUES (?, ?, ?)",
                    (params[0], params[1], params[2]))
 
 
+# dictionary to store queries and their corresponding parameters
 query_dict = {
     'all_actors': {'query': show_all(ALL_ACTORS), 'parameter_name': None},
     'all_movies': {'query': show_all(ALL_MOVIES), 'parameter_name': None},

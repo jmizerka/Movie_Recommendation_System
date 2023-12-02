@@ -1,12 +1,14 @@
 import sqlite3
 import pandas as pd
 
+#import files for database
 actors = pd.read_csv('../../data/separated_dfs/actors.csv')
 genres = pd.read_csv('../../data/separated_dfs/genres.csv')
 movies = pd.read_csv('../../data/separated_dfs/movies.csv')
 movies_actors = pd.read_csv('../../data/separated_dfs/movies_actors.csv')
 movies_genres = pd.read_csv('../../data/separated_dfs/movies_genres.csv')
 
+# connect to database
 conn = sqlite3.connect('../../data/movies.db')
 cursor = conn.cursor()
 
@@ -48,13 +50,16 @@ tables_script = """
         date TEXT);
         """
 
+# create tables
 cursor.executescript(tables_script)
+
+# save data from files to sql tables
 movies.to_sql('movies', conn, index=False, if_exists='append')
 genres.to_sql('genres', conn, index=False, if_exists='append')
 actors.to_sql('actors', conn, index=False, if_exists='append')
 movies_genres.to_sql('movies_genres', conn, index=False, if_exists='append')
 movies_actors.to_sql('movies_actors', conn, index=False, if_exists='append')
 
+# commit changes to the database and close the connection
 conn.commit()
-
 conn.close()

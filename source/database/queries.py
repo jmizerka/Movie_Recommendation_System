@@ -1,3 +1,5 @@
+# file to store long queries
+
 MOVIES_OF_ACTOR = f"""SELECT
      movies.title,
      GROUP_CONCAT(genres.genre_name) AS genres,

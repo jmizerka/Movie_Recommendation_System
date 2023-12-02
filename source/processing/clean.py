@@ -1,23 +1,32 @@
 import pandas as pd
 import numpy as np
 
-
+# function to encode names into ids
 def encode(column, unique_values, id_column_name):
     encoded_column = column.astype(str)
     temp_list = []
 
+    # iterate over each value in column
     for i in encoded_column:
+        # clean formatting issues
         i = i.replace(',\xa0', ',')
         values = i.split(',')
+
+        # map each value to its corresponding index (id)
         ids = [str(unique_values.index[unique_values == j.strip()].values[0]) for j in values if
                unique_values.isin([j.strip()]).any()]
+
+        # join the mapped indices if different than NaN
         new_list = ','.join(ids) if ids else np.nan
         temp_list.append(new_list)
+
+    # create series with encoded values
     enc_series = pd.Series(temp_list, name=id_column_name)
+
     enc_series.replace('', 'nan', inplace=True)
     return enc_series
 
-
+# function to create df with unique combinations of movie_id and actor/genre_id
 def expand(index, col, col_name):
     df = pd.DataFrame({'movie_id': index, f'{col_name}': col})
     df = (df.set_index('movie_id')[f'{col_name}']
@@ -27,10 +36,13 @@ def expand(index, col, col_name):
           .reset_index(name=f'{col_name}'))
     return df
 
-
+# read the data from csv file
 data = pd.read_csv('../../data/imdb_movies.csv')
-data = data.drop_duplicates(subset=['names', 'date_x'])
-data = data.reset_index(drop=True)
+
+# drop duplicated movies
+data = data.drop_duplicates(subset=['names', 'date_x']).reset_index(drop=True)
+
+# extract and rename columns of interest
 movies_df = data[['names', 'date_x', 'orig_lang', 'country', 'overview', 'score']]
 movies_df.columns = ['title', 'date', 'original_lang', 'country', 'overview', 'score']  # rename columns
 movies_df['date'] = movies_df['date'].str[-5:]
@@ -40,20 +52,24 @@ movies_df.to_csv('../../data/separated_dfs/movies.csv', index=True, index_label=
 
 # create np.array of unique movie genres
 unique_genres = data['genre'].astype(str).str.split(',\xa0', expand=True).stack().unique()
+
 # remove NaN and convert to series
 unique_genres = pd.Series(unique_genres[unique_genres != 'nan'], name='genre_name')
+
 # save genres data to separate csv
 unique_genres.to_csv('../../data/separated_dfs/genres.csv', index=True, index_label='genre_id')
 
 actors_list = []
-# remove some bad formatting and drop cells with mistakes in the data
+# extract and clean up a list of actors from 'crew' column
 for element in data['crew'].astype(str):
     text = element.replace(', Sr.', ' Sr.').replace(', Jr.', ' Jr.').replace(', ,', ', ').rstrip(', ').strip()
     splitted_text = text.split(',')
     if len(splitted_text) % 2 == 0:
         actors_list.extend(splitted_text)
+
 # remove unnecessary spaces
 actors_list = [actor.strip() for actor in actors_list]
+
 # return np.array with unique values and number of occurences
 unique = np.unique(actors_list, return_counts=True)
 
@@ -81,15 +97,14 @@ name = [unique[0][i] for i in range(len(unique[0]))
 actors = pd.Series(name, name='actor_name')
 actors.to_csv('../../data/separated_dfs/actors.csv', index=True, index_label='actor_id')
 
-# save movies_and_genres data to separate csv
+# encode genres and actors
 genres_series = encode(data['genre'], unique_genres, 'genre_id')
-# genres_series.to_csv('../../data/separated_dfs/movies_genres.csv', index=False)
-
-# save movies_and_actors data to separate csv
 actors_series = encode(data['crew'], actors, 'actor_id')
 
+#create bridge dataframes between movies and actors/genres
 movies_actors = expand(list(movies_df.index), actors_series, 'actor_id')
-
-movies_actors.to_csv('../../data/separated_dfs/movies_actors.csv', index=False)
 movies_genres = expand(list(movies_df.index), genres_series, 'genre_id')
+
+# save dataframe to files
+movies_actors.to_csv('../../data/separated_dfs/movies_actors.csv', index=False)
 movies_genres.to_csv('../../data/separated_dfs/movies_genres.csv', index=False)
