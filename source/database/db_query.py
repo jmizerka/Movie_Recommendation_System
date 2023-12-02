@@ -2,6 +2,7 @@ import sqlite3
 import pandas as pd
 from source.database.queries import *
 
+
 def db_connector(func):
     def wrapper(*args, **kwargs):
         conn = sqlite3.connect('data/movies.db')
@@ -10,6 +11,7 @@ def db_connector(func):
         conn.commit()
         conn.close()
         return result
+
     return wrapper
 
 
@@ -43,7 +45,7 @@ def add_movie(cursor, params):
     if count == 0:
         cursor.execute(
             "INSERT INTO movies (title, date, original_lang, country, overview, score) VALUES (?, ?, ?, ?, ?, ?)",
-            (params[0],params[1],params[2],params[3],params[4],params[5],))
+            (params[0], params[1], params[2], params[3], params[4], params[5],))
         movie_id = cursor.lastrowid
         for genre_name in params[6].split(','):
             cursor.execute("SELECT genre_id FROM genres WHERE genre_name = ?", (genre_name,))
@@ -58,7 +60,7 @@ def add_movie(cursor, params):
         print("A movie with same title and release year already exists.")
 
 @db_connector
-def add_actor(cursor,params):
+def add_actor(cursor, params):
     cursor.execute(f"SELECT COUNT(*) FROM actors WHERE actor_name = ?", (params[0],))
     count = cursor.fetchone()[0]
     if count == 0:
@@ -80,24 +82,24 @@ def add_rating(cursor, params):
 
 
 query_dict = {
-    'all_actors': {'query': ALL_ACTORS, 'parameter_name': None},
-    'all_movies': {'query': ALL_MOVIES, 'parameter_name': None},
-    'all_genres': {'query': ALL_GENRES, 'parameter_name': None},
-    'actors_stats': {'query': ACTOR_STATS, 'parameter_name': None},
-    'all_movies_actor': {'query': MOVIES_OF_ACTOR, 'parameter_name': ('actor_name',)},
+    'all_actors': {'query': show_all(ALL_ACTORS), 'parameter_name': None},
+    'all_movies': {'query': show_all(ALL_MOVIES), 'parameter_name': None},
+    'all_genres': {'query': show_all(ALL_GENRES), 'parameter_name': None},
+    'actors_stats': {'query': show_all(ACTOR_STATS), 'parameter_name': None},
+    'all_movies_actor': {'query':  MOVIES_OF_ACTOR, 'parameter_name': ('actor_name',)},
     'all_actors_movie': {'query': ACTORS_IN_MOVIE, 'parameter_name': ('title',)},
     'all_movies_genre': {'query': MOVIES_OF_GENRE, 'parameter_name': ('genre_name',)},
     'movie_info': {'query': MOVIE_BY_TITLE, 'parameter_name': ('movie_title',)},
     'movies_from_year': {'query': MOVIES_OF_YEAR, 'parameter_name': ('release_year',)},
-    'highest_rated': {'query': HIGHEST_RATED, 'parameter_name': None},
-    'lowest_rated': {'query': LOWEST_RATED, 'parameter_name': None},
-    'num_movies_genre': {'query': NUM_MOVIES_BY_GENRE, 'parameter_name': None},
-    'avg_score_genre': {'query': AVG_RATE_BY_GENRE, 'parameter_name': None},
-    'avg_score_actor': {'query': AVG_RATE_BY_ACTOR, 'parameter_name': None},
+    'highest_rated': {'query': show_all(HIGHEST_RATED), 'parameter_name': None},
+    'lowest_rated': {'query': show_all(LOWEST_RATED), 'parameter_name': None},
+    'num_movies_genre': {'query': show_all(NUM_MOVIES_BY_GENRE), 'parameter_name': None},
+    'avg_score_genre': {'query': show_all(AVG_RATE_BY_GENRE), 'parameter_name': None},
+    'avg_score_actor': {'query': show_all(AVG_RATE_BY_ACTOR), 'parameter_name': None},
     'new_actor': {'query': add_actor, 'parameter_name': ('actor_name',)},
     'new_genre': {'query': add_genre, 'parameter_name': ('genre_name',)},
-    'new_movie': {'query': add_movie,'parameter_name': ('title', 'date', 'original_lang',
-                                                        'country', 'overview', 'score', 'genres',)},
+    'new_movie': {'query': add_movie, 'parameter_name': ('title', 'date', 'original_lang',
+                                                         'country', 'overview', 'score', 'genres',)},
     'remove_data': {'query': remove, 'parameter_name': ('table_name', 'col', 'id',)},
     'update_data': {'query': update, 'parameter_name': ('table_name', 'col_name', 'value', 'condition',)},
-    'custom': {'query': show_all, 'parameter_name': None}}
+    'custom': {'query': show_all, 'parameter_name': ('query',)}}
