@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk, scrolledtext, messagebox
 import pickle
 from source.machine_learning.recommenders import get_recommendation
 
@@ -19,7 +19,7 @@ class MovieRecommendation:
         go_back_button = ttk.Button(recommendation_frame, text="Go back", command=self.master.create_main_menu)
         go_back_button.pack(pady=10, side="bottom")
 
-        # create an etry frame to take user input (title of a movie)
+        # create an entry frame to take user input (title of a movie)
         entry_frame = ttk.Frame(recommendation_frame)
         entry_frame.pack(pady=10)
 
@@ -44,24 +44,27 @@ class MovieRecommendation:
         # load recommendation algorithm
         indices, sim = self.load_recommendation_variables()
 
-        # get movie recommendation based on entered title
-        recommendations = get_recommendation(indices, entry.get(), sim)
+        try:
+            # get movie recommendation based on entered title
+            recommendations = get_recommendation(indices, entry.get(), sim)
+            result_string = recommendations.to_string(index=False)
 
-        # clear existing content in the master window
-        self.clear_existing_content()
+            # clear existing content in the master window
+            self.clear_existing_content()
 
-        # create a scrolled text widget with recommendations
-        result_text = scrolledtext.ScrolledText(self.master, wrap=tk.WORD, width=60, height=20)
-        result_text.pack(expand=True, fill='both')
-        result_text.tag_configure("center", justify="center")
+            # create a scrolled text widget with recommendations
+            result_text = scrolledtext.ScrolledText(self.master, wrap=tk.WORD, width=60, height=20)
+            result_text.pack(expand=True, fill='both')
+            result_text.tag_configure("center", justify="center")
 
-        # create a go back button that creates a new MovieRecommendation instance
-        go_back_button = ttk.Button(self.master, text="Go back", command=lambda: MovieRecommendation(self.master))
-        go_back_button.pack(pady=10, side="bottom")
+            # create a go back button that creates a new MovieRecommendation instance
+            go_back_button = ttk.Button(self.master, text="Go back", command=lambda: MovieRecommendation(self.master))
+            go_back_button.pack(pady=10, side="bottom")
 
-        # convert recommendation (dataframe) to string and insert into the widget
-        result_string = recommendations.to_string(index=False)
-        result_text.insert(tk.END, result_string)
+            # convert recommendation (dataframe) to string and insert into text widget
+            result_text.insert(tk.END, result_string)
+        except KeyError:
+            messagebox.showerror("Error", "Invalid input. Please enter a valid rating.")
 
     def clear_existing_content(self):
         for widget in self.master.winfo_children():

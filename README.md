@@ -53,10 +53,11 @@
   This command will execute the main.py script, launching the Movie Recommender System.
 
 ## Future improvements
-  1. Cleaning, refactoring, optimizing code - this only the first functional version
+  1. Cleaning, refactoring, optimizing code - this is only the first functional version
   2. Changing GUI to something more advanced and modern - I am using tkinter which is not the best
   3. Better recommendation algoritm
   4. Increase and update database - for now it is only about 10000 movies
+  5. Error handling
 
 ## Data
 This app was built using [IMDB movies Kaggle Dataset](https://www.kaggle.com/datasets/ashpalsingh1525/imdb-movies-dataset).

@@ -1,6 +1,8 @@
 # Import necessary modules and classes from the tkinter library
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog, messagebox
+
+import pandas as pd
 from ttkthemes import ThemedStyle
 
 # Import functions from a custom database module
@@ -94,27 +96,29 @@ class QueryDatabase:
 
     # method to display query results in a new window
     def show_in_window(self, dataframe):
-        new_window = tk.Toplevel(self.master)
-        self.style(new_window, "Query Result Window")
-
         if dataframe is not None:
-            # if there are results fetched, display them ion a scrolled text widget
-            text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Courier', 14))
-            text_widget.pack(padx=20, pady=20, expand=True, fill="both")
-            formatted_text = self.format_dataframe(dataframe)
-            text_widget.insert(tk.END, formatted_text)
-            text_widget.tag_configure("center", justify="center")
-            text_widget.tag_add("center", "1.0", "end")
+            if len(dataframe) > 1:
+                new_window = tk.Toplevel(self.master)
+                self.style(new_window, "Query Result Window")
+                # if there are results fetched, display them ion a scrolled text widget
+                text_widget = scrolledtext.ScrolledText(new_window, wrap=tk.WORD, width=80, height=20, font=('Courier', 14))
+                text_widget.pack(padx=20, pady=20, expand=True, fill="both")
+                formatted_text = self.format_dataframe(dataframe)
+                text_widget.insert(tk.END, formatted_text)
+                text_widget.tag_configure("center", justify="center")
+                text_widget.tag_add("center", "1.0", "end")
 
             # add a button to save results to a csv file
-            save_button = ttk.Button(new_window, text="Save to CSV", command=lambda: self.save_to_csv(dataframe))
-            save_button.pack(pady=10)
+                save_button = ttk.Button(new_window, text="Save to CSV", command=lambda: self.save_to_csv(dataframe))
+                save_button.pack(pady=10)
+                close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
+                close_button.pack(pady=10)
         else:
+            new_window = tk.Toplevel(self.master)
+            self.style(new_window, "Query Result Window")
             # if other action than fetching results was performed then display a label indicating completion
             label = ttk.Label(new_window, text=" Action done. You may close the window")
             label.pack(side="top", anchor="center")
-        close_button = ttk.Button(new_window, text="Close", command=new_window.destroy)
-        close_button.pack(pady=10)
 
     # static method to format results for display. may not work with different screen formats
     @staticmethod
@@ -171,7 +175,7 @@ class QueryDatabase:
     # method to execute queries based on user input
     def proceed_action(self, button_name, entry_dict):
         if all(entry.get() for entry in entry_dict.values()):
-            params = self.get_params_for_action(button_name, entry_dict)
+            params = self.get_params_for_action(entry_dict)
             data = self.execute_query(button_name, params)
             self.show_in_window(data)
 
@@ -186,7 +190,13 @@ class QueryDatabase:
             self.query_dict[button_name]['query'](params)
             data = None
         elif button_name == self.query_buttons[19]:
-            data = self.query_dict[button_name]['query'](str(params[0]))
+            try:
+                data = self.query_dict[button_name]['query'](str(params[0]))
+            except:
+                messagebox.showerror("Error", "Invalid input.")
+                data = pd.DataFrame()
         else:
             data = show_all(self.query_dict[button_name]['query'], params)
+            if len(data) == 0:
+                messagebox.showerror("Error", "Invalid input.")
         return data
